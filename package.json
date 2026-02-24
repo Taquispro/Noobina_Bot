@@ -1,17 +1,17 @@
 {
-  "name": "gemini-telegram-bot",
+  "name": "noobina-khatoon-bot",
   "version": "1.0.0",
-  "description": "A Telegram bot powered by Google Gemini AI",
-  "main": "bot.js",
+  "description": "Devoted AI bot for Taqueveem",
+  "main": "Bot.js",
   "type": "module",
   "scripts": {
-    "start": "node bot.js",
-    "dev": "node --watch bot.js"
+    "start": "node Bot.js",
+    "dev": "node --watch Bot.js"
   },
   "dependencies": {
     "@google/genai": "^1.42.0",
     "dotenv": "^16.4.7",
+    "express": "^4.21.2",
     "telegraf": "^4.16.3"
   }
-  
 }
