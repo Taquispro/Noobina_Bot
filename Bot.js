@@ -39,7 +39,7 @@ bot.on("text", async (ctx) => {
 
   } catch (error) {
     console.error(error);
-    ctx.reply("Noobina got shy thinking about Taqueveem 😳");
+    ctx.reply("Taqueveem is cool 😳");
   }
 });
 
