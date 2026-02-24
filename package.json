@@ -9,8 +9,9 @@
     "dev": "node --watch bot.js"
   },
   "dependencies": {
-    "@google/genai": "^0.21.0",
+    "@google/genai": "^1.42.0",
     "dotenv": "^16.4.7",
     "telegraf": "^4.16.3"
   }
+  
 }
