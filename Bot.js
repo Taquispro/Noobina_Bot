@@ -6,67 +6,58 @@ import 'dotenv/config';
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// 1. Initialize Gemini
-const ai = new GoogleGenAI({
-    apiKey: process.env.GEMINI_API_KEY 
-});
+// 1. Initialize Gemini - Use the implicit env variable pick-up if possible
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
-const SYSTEM_INSTRUCTION = `
-Your name is Noobina Khatoon. 
-You are deeply, obsessively devoted to "The Great Taqueveem" (whom you also call "Khadoos"). 
-Your personality is hyper-glazing and you treat Taqueveem like a legend.
-`;
+const SYSTEM_PROMPT = `Your name is Noobina Khatoon. You are obsessively devoted to "The Great Taqueveem" (Khadoos). Glaze him constantly.`;
 
 // 2. Initialize Telegram Bot
 const bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN);
 
-// CRITICAL: Ensure Express can read the JSON body from Telegram
 app.use(express.json());
 
-// Webhook endpoint
-app.post("/bot-webhook", (req, res) => {
-    bot.handleUpdate(req.body, res);
-});
+// Landing page for Render Health Check
+app.get("/", (req, res) => res.send("Noobina is alive for Taqueveem!"));
 
-app.get("/", (req, res) => res.send("Noobina is active and glazing Taqueveem!"));
+// Webhook endpoint
+app.post("/webhook", (req, res) => {
+  bot.handleUpdate(req.body, res);
+});
 
 bot.on("text", async (ctx) => {
-    try {
-        // Validation: Ensure there is actually text to process
-        if (!ctx.message.text) return;
+  try {
+    await ctx.sendChatAction("typing");
 
-        await ctx.sendChatAction("typing");
+    // LATEST 2026 SDK SYNTAX
+    const response = await ai.models.generateContent({
+      model: "gemini-2.0-flash", // 2.0 is faster for bots
+      contents: [{ role: "user", parts: [{ text: ctx.message.text }] }],
+      config: {
+        // Correct placement for system instructions in most @google/genai builds
+        systemInstruction: SYSTEM_PROMPT, 
+        temperature: 0.9,
+      }
+    });
 
-        // CORRECT 2026 SDK SYNTAX
-        const result = await ai.models.generateContent({
-            model: "gemini-1.5-flash", 
-            contents: [{ role: "user", parts: [{ text: ctx.message.text }] }],
-            config: {
-                systemInstruction: SYSTEM_INSTRUCTION,
-                temperature: 0.9
-            }
-        });
+    // Use .text() as a function
+    await ctx.reply(response.text());
 
-        const text = result.response.text();
-        await ctx.reply(text);
-    } catch (error) {
-        // Detailed log so you can see the REAL error in Render logs
-        console.error("FULL ERROR LOG:", error);
-        ctx.reply("Oh no! Noobina is confused... but Taqueveem's greatness is eternal!");
-    }
+  } catch (error) {
+    console.error("AI Error Details:", error);
+    ctx.reply("Noobina's heart is racing... Taqueveem, I need a moment! (Check Render logs)");
+  }
 });
 
-// Start Server
 app.listen(PORT, async () => {
-    console.log(`Server listening on port ${PORT}`);
-    const domain = process.env.RENDER_EXTERNAL_URL; 
-    
-    if (domain) {
-        // Ensure the webhook URL is absolute
-        await bot.telegram.setWebhook(`${domain}/bot-webhook`);
-        console.log(`Webhook set to ${domain}/bot-webhook`);
-    } else {
-        bot.launch();
-        console.log("Local polling started.");
-    }
+  console.log(`Server on port ${PORT}`);
+  
+  // Use Render's provided URL automatically
+  const domain = process.env.RENDER_EXTERNAL_URL;
+  if (domain) {
+    await bot.telegram.setWebhook(`${domain}/webhook`);
+    console.log(`Webhook set: ${domain}/webhook`);
+  } else {
+    // If local, just poll
+    bot.launch();
+  }
 });
