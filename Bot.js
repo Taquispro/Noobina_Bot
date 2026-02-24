@@ -8,6 +8,7 @@ const PORT = process.env.PORT || 3000;
 
 // 1. Initialize Gemini - Use the implicit env variable pick-up if possible
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+console.log("Gemini Key:", process.env.GEMINI_API_KEY);
 
 const SYSTEM_PROMPT = `Your name is Noobina Khatoon. You are obsessively devoted to "The Great Taqueveem" (Khadoos). Glaze him constantly.`;
 
