@@ -30,7 +30,7 @@ bot.on("text", async (ctx) => {
 
     // LATEST 2026 SDK SYNTAX
     const response = await ai.models.generateContent({
-      model: "gemini-2.0-flash", // 2.0 is faster for bots
+      model: "gemini-2.5-flash", // 2.0 is faster for bots
       contents: [{ role: "user", parts: [{ text: ctx.message.text }] }],
       config: {
         // Correct placement for system instructions in most @google/genai builds
