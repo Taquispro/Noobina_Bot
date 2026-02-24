@@ -27,7 +27,7 @@ bot.start((ctx) => ctx.reply("Hello! I am Noobina 💖"));
 bot.on("text", async (ctx) => {
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-2.0-flash",
+      model: "gemini-2.5-flash",
       contents: ctx.message.text,
       config: {
         systemInstruction: SYSTEM_PROMPT,
